@@ -53,7 +53,7 @@ function [] = plotTopField(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_in, r
 
     x = r_out * cos(th) + center(1);
     y = r_out * sin(th) + center(2);
-    plot(x, y, 'linewidth', 2, 'color', 'k');
+    plot(x, y, 'linewidth', 2, 'color', 'k'); hold on;
 
     x = r_in * cos(th) + center(1);
     y = r_in * sin(th) + center(2);

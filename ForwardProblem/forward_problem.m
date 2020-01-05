@@ -1,7 +1,7 @@
 clc;
 clear;
 %% Init constants
-r_out = 1;
+r_out = 2;
 r_in = 0.2 * r_out;
 center = [r_out r_out];
 
@@ -13,6 +13,9 @@ Ic_vec = [3 3 3 3 3 9 3 3 3 3 3 3 3 3 9 3];
 Ic_vec = Ic_vec * 10000000000;
 
 [MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, MAGNETIC_B_SECTIONS] = getSectionsField(N, r_in, r_out, Ic_vec);
+%% Helmhotls coil
+plotHelmhotz(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_in, r_out);
+   
 %% Tokamak coils (1, 2, ..., 16)
 plotSectionsField(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_in, r_out, 'R');
 plotSectionsField(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_in, r_out, 'Z');
