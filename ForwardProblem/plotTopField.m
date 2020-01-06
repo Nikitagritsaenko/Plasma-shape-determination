@@ -17,7 +17,7 @@ function [] = plotTopField(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_in, r
     center = [r_out r_out];
     coil_center = [r_in, 0];
     
-    grid_step = 2*R / size(MAGNETIC_B_SECTIONS_R, 2);
+    grid_step = 2*R / size(MAGNETIC_B_SECTIONS_R, 2)
 
     grid_x = 0:0.005:r_out + center(1);
     grid_y = 0:0.005:r_out + center(2);
@@ -28,16 +28,20 @@ function [] = plotTopField(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_in, r
     for i = 1:length(grid_x)
         for j = 1:length(grid_y)
             r = sqrt((grid_x(i) - center(1))^2 + (grid_y(j) - center(2))^2);
-
+          
             if (r >= r_in && r <= r_out)
                 phi = acos((grid_x(i) - center(1)) / r);
+              
+                if (grid_y(j) - center(2) < 0)
+                    phi = -phi + 2*pi;
+                end
                 [MR, MZ] = calculateSectionB(phi, MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z);
                 if (mode == 'R')
                     MR_ZERO_Z = MR(:, zero_z_idx);
                 else
                     MR_ZERO_Z = MZ(:, zero_z_idx);
                 end
-                r_idx = floor(r / grid_step);
+                r_idx = ceil(r / grid_step);
                 MAGNETIC_B(i, j) = MR_ZERO_Z(r_idx);
             end
         end
@@ -73,8 +77,8 @@ function [] = plotTopField(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_in, r
 
         line(xx, yy, 'color', 'k');
 
-        x_text = 1.04 * r_out * cos(phi) + center(1);
-        y_text = 1.04 * r_out * sin(phi) + center(2);
+        x_text = 1.06 * r_out * cos(phi) + center(1);
+        y_text = 1.06 * r_out * sin(phi) + center(2);
 
         text(x_text, y_text, int2str(i), 'FontSize', 10)
     end

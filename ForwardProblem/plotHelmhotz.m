@@ -11,22 +11,20 @@ function [] = plotHelmhotz(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_in, r
     R = (r_out - r_in);
 
     figure('color', 'white');
-    %contour(MR, 1000)
-    imagesc([r_in r_out + R], [-R R], MR);
+    contour(MR, 15)
+    %imagesc([0 R], [-R R], MR);
     title("B_r Helmhotlz");
     xlabel('r, m');
     ylabel('z, m');
-    colormap([pink
-                flip(hot)]);
+    colormap(hot);
     colorbar;
 
     figure('color', 'white');
-    %contour(MZ, 1000)
-    imagesc([r_in r_out + R], [-R R], MZ);
+    contour(MZ, 15)
+    %imagesc([0 R], [-R R], MZ);
     title("B_z Helmhotlz");
     xlabel('r, m');
     ylabel('z, m');
-    colormap([pink
-                flip(hot)]);
+    colormap(hot);
     colorbar;
 end

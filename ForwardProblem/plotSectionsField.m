@@ -10,8 +10,7 @@ function [] = plotSectionsField(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_
     for n = 1:1:N
         subplot(sqrt(N), sqrt(N), n);
 
-        colormap([pink
-            flip(hot)]);
+        colormap(hot);
 
         [MR, MZ] = calculateCoilB(n, MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z);
         MR = squeeze(MR(1, :, :));
@@ -20,7 +19,7 @@ function [] = plotSectionsField(MAGNETIC_B_SECTIONS_R, MAGNETIC_B_SECTIONS_Z, r_
         if (mode == 'R')
             imagesc([r_in r_out + R], [-R R], MR);
             title("B_r n = " + n);
-            caxis([-100 100]);
+            caxis([-200 200]);
         else
             imagesc([r_in r_out + R], [-R R], MZ);
             title("B_z n = " + n);
