@@ -16,7 +16,7 @@ function [] = plotTopField(r_in, r_out, N, Ic_vec, grid_step, mode)
     R = (r_out - r_in); % coil radius
     center = [r_out r_out];
 
-    step = 0.005;
+    step = 0.001;
     grid_x = 0:step:r_out + center(1);
     grid_y = 0:step:r_out + center(2);
     
@@ -39,16 +39,15 @@ function [] = plotTopField(r_in, r_out, N, Ic_vec, grid_step, mode)
                     phi = -phi + 2*pi;
                 end
                 
-                [MR, MZ] = calculateCoilB(phi, N, r_in, r_out, I, grid_step, 1);
-                zero_z_idx = floor(size(MZ, 1) / 2);
-        
+                [MR, MZ] = calculateZeroZ(phi, N, r_in, r_out, I, grid_step);
+              
                 if (mode == 'R')
-                    M_ZERO_Z = MR(zero_z_idx, :);
+                    M_ZERO_Z = MR;
                 else
-                    M_ZERO_Z = MZ(zero_z_idx, :);
+                    M_ZERO_Z = MZ;
                 end
                 
-                r_idx = ceil((r - r_in) / grid_step);
+                r_idx = ceil(r / grid_step);
                 MAGNETIC_B(i, j) = M_ZERO_Z(r_idx);
             end
         end

@@ -11,18 +11,18 @@ function [] = plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, mode)
 
         colormap(flip(hot));
 
-        [MR, MZ] = calculateCoilB(n, N, r_in, r_out, Ic_vec, grid_step, 0);
+        [MR, MZ] = calculateCoilB(n, N, r_in, r_out, Ic_vec, grid_step);
        
         if (mode == 'R')
             imagesc([r_in, r_out], [-R, R], MR);
             title("B_R n = " + n);
             set(gca,'YDir','normal')
-            caxis([-200 200]);
+            %caxis([-200 200]);
         else
             imagesc([r_in, r_out], [-R, R], MZ);
             title("B_Z n = " + n);
             set(gca,'YDir','normal')
-            caxis([-2000 0]);
+            %caxis([-2000 0]);
         end
         
         hold on;

@@ -10,16 +10,17 @@ r_out = R + r;
 N = 16; % num of sections
 
 rc = r_in + (r_out - r_in) / 2;
-Ic_vec = [3 3 3 3 3 9 3 3 3 3 3 3 3 3 9 3];
-%Ic_vec = 3 * ones(1, N);
-Ic_vec = Ic_vec * 10000000000;
+Ic_vec = [1 1 1 1 1 3 1 1 1 1 1 1 1 1 3 1];
+Ic_vec = ones(1, N);
+Ic_vec = Ic_vec * 1e7;
 
 grid_step = 0.01;
 %% Helmhotls coil
-Ih = [3 4];
-Ih = Ih * 10000000000;
+Ih = [2 0];
+Ih = Ih * 1e7;
 H = 1;
-plotHelmhotz(Ih(1), Ih(2), H);
+R = 1;
+plotHelmhotz(Ih(1), Ih(2), H, R);
    
 %% Tokamak coils (1, 2, ..., 16)
 plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, 'R');

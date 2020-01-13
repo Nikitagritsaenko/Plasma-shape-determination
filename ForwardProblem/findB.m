@@ -1,15 +1,17 @@
-function [Br, Bz] = findB(r, z, rc, zc, Ic)
+function [Br, Bz] = findB(r, z, a, I)
     c = 299792458;
-    k_sqr = 4 * rc * r / ((rc + r) ^ 2 + (zc - z)^2);
+    eps = a / 1e2;
+    
+    k_sqr = 4 * a * r / ((a + r) ^ 2 + z^2);
     k = sqrt(k_sqr);
     
     [K, E] = ellipke(k);
     
-    if (zc == z)
+    if (r == 0)
         Br = 0;
+        Bz = 2 * pi * a^2 * I / (c * (a^2 + z^2)^(3/2));
     else
-        Br = (Ic / c) * ((zc - z) / r) * 2 * k * sqrt(rc * r) * ((1 - k_sqr / 2) * E - K);
+        Br = (I / c) * 2 * z / (r * sqrt((a + r)^2 + z^2)) * (-K + E * (a^2 + r^2 + z^2) / ((a - r)^2 + z^2));
+        Bz = (I / c) * 2 / (sqrt((a + r)^2 + z^2)) * (K + E * (a^2 - r^2 - z^2) / ((a - r)^2 + z^2));
     end
-    
-    Bz = (Ic / c) * 2 * k * sqrt(rc * r) * ((r - rc) / r * (1 - k_sqr / 2) * E - K);
 end
