@@ -1,6 +1,6 @@
 function [] = plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, mode)
     R = (r_out - r_in) / 2; % coil radius
-    coil_center = [r_in+R, 0];
+    coil_center = [r_in + R, 0];
 
     F = figure('color', 'white', 'Name', 'Tokamak sections');
     set(F, 'MenuBar', 'none');
@@ -22,7 +22,7 @@ function [] = plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, mode)
             imagesc([r_in, r_out], [-R, R], MZ);
             title("B_Z n = " + n);
             set(gca,'YDir','normal')
-            %caxis([-2000 0]);
+            caxis([0 100]);
         end
         
         hold on;

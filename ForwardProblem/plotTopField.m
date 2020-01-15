@@ -1,24 +1,19 @@
-function [] = plotTopField(r_in, r_out, N, Ic_vec, grid_step, mode)
+function [] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
     F = figure('color', 'white', 'Name', 'Tokamak (view from top)');
-    set(F, 'MenuBar', 'none');
-    set(F, 'ToolBar', 'none');
     
     if (mode == 'R')
         title('B_r (z = 0)');
-    else
+    elseif (mode == 'Z')
         title('B_z (z = 0)');
+    else
+        title('B (z = 0)');
     end
-    hold on
-    
-    z = 0;
-    zc = 0;
+    hold on;
     
     R = (r_out - r_in); % coil radius
-    center = [r_out r_out];
 
-    step = 0.001;
-    grid_x = 0:step:r_out + center(1);
-    grid_y = 0:step:r_out + center(2);
+    grid_x = -r_out:step:r_out;
+    grid_y = -r_out:step:r_out;
     
     MAGNETIC_B = zeros(length(grid_x), length(grid_y));
     
@@ -28,71 +23,84 @@ function [] = plotTopField(r_in, r_out, N, Ic_vec, grid_step, mode)
         I(i) = Ic_vec(N_vec(i));
     end
     
+    r0 = r_in + R;
+    angle_step = 2*pi / N;
+    
     for i = 1:length(grid_x)
         for j = 1:length(grid_y)
-            r = sqrt((grid_x(i) - center(1))^2 + (grid_y(j) - center(2))^2);
+            r = sqrt((grid_x(i))^2 + (grid_y(j))^2);
           
             if (r >= r_in && r <= r_out)
-                phi = acos((grid_x(i) - center(1)) / r);
+                phi = acos((grid_x(i)) / r);
                 
-                if (grid_y(j) - center(2) < 0)
+                if (grid_y(j) < 0)
                     phi = -phi + 2*pi;
                 end
                 
-                [MR, MZ] = calculateZeroZ(phi, N, r_in, r_out, I, grid_step);
-              
-                if (mode == 'R')
-                    M_ZERO_Z = MR;
-                else
-                    M_ZERO_Z = MZ;
+                n2 = ceil(phi / angle_step) + 1;
+                n1 = floor(phi / angle_step) + 1;
+                if (n1 == 16)
+                  n2 = 1;  
                 end
                 
-                r_idx = ceil(r / grid_step);
-                MAGNETIC_B(i, j) = M_ZERO_Z(r_idx);
+                phi1 = angle_step * (n1 - 1);
+                phi2 = angle_step * (n2 - 1);
+                
+                dphi1 = phi1 - phi;
+                r1 = r * cos(dphi1) - r0;
+                z1 = abs(r * sin(dphi1));
+                
+                [Br1, Bz1] = findB(abs(r1), z1, R, Ic_vec(N_vec(n1)));
+
+                dphi2 = phi2 - phi;
+                r2 = r * cos(dphi2) - r0;
+                z2 = -abs(r * sin(dphi2));
+                
+                [Br2, Bz2] = findB(abs(r2), z2, R, Ic_vec(N_vec(n2)));
+                
+                if (mode == 'R')
+                    MAGNETIC_B(i, j) = Br1 + Br2;
+                elseif (mode == 'Z')
+                    MAGNETIC_B(i, j) = Bz1 + Bz2;
+                else
+                    MAGNETIC_B(i, j) = sqrt((Br1 + Br2)^2 + (Bz1 + Bz2)^2);
+                end
+
             end
         end
     end
-    MAGNETIC_B;
     
+    % Plot field
+    center = [r_out r_out];
     imagesc([-r_out r_out] + center(1), [-r_out r_out] + center(2), MAGNETIC_B)
     colormap(flip(hot));
-    
-    if (mode == 'R')
-      %caxis([-200 200]);
-    else
-      %caxis([-2500 0]);
-    end
-                
     colorbar;
-
+    if (mode == 'R')
+        caxis([0, 3]);
+    else
+        caxis([0, 3]);
+    end
     % Plot circles
     th = 0 : 0.01: 2 * pi;
-
     x = r_out * cos(th) + center(1);
     y = r_out * sin(th) + center(2);
     plot(x, y, 'linewidth', 2, 'color', 'k'); hold on;
-
     x = r_in * cos(th) + center(1);
     y = r_in * sin(th) + center(2);
     plot(x, y, 'linewidth', 2, 'color', 'k');
-
     axis equal;
     axis off;
-
     phi_vec = 0:2*pi/N:2*pi;
 
     % Plot lines
     for i = 1:N
         phi = phi_vec(i);
-
         xx = [r_in * cos(phi) + center(1) r_out * cos(phi) + center(1)];
         yy = [r_in * sin(phi) + center(2) r_out * sin(phi) + center(2)];
-
         line(xx, yy, 'color', 'k');
-
         x_text = 1.05 * r_out * cos(phi) + center(1);
         y_text = 1.05 * r_out * sin(phi) + center(2);
-
-        text(x_text, y_text, int2str(i), 'FontSize', 10, 'color', 'y')
+        text(x_text, y_text, int2str(i), 'FontSize', 10, 'color', 'k')
     end
+
 end

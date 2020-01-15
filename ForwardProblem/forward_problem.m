@@ -14,9 +14,9 @@ Ic_vec = [1 1 1 1 1 3 1 1 1 1 1 1 1 1 3 1];
 Ic_vec = ones(1, N);
 Ic_vec = Ic_vec * 1e7;
 
-grid_step = 0.01;
+grid_step = 0.005;
 %% Helmhotls coil
-Ih = [2 0];
+Ih = [1 1];
 Ih = Ih * 1e7;
 H = 1;
 R = 1;
@@ -26,7 +26,8 @@ plotHelmhotz(Ih(1), Ih(2), H, R);
 plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, 'R');
 plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, 'Z');
 %% Tokamak (view from top)
-plotTopField(r_in, r_out, N, Ic_vec, grid_step, 'R');
-plotTopField(r_in, r_out, N, Ic_vec, grid_step, 'Z');
-
+step = 0.004;
+plotTopField(r_in, r_out, N, Ic_vec, step, 'R');
+plotTopField(r_in, r_out, N, Ic_vec, step, 'Z');
+%plotTopField(r_in, r_out, N, Ic_vec, step, 'RZ');
 

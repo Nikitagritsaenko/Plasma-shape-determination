@@ -31,18 +31,16 @@ function [MR, MZ] = calculateCoilB(n, N, r_in, r_out, Ic_vec, grid_step)
 
     N_vec = 1:1:16;
 
-    zc = 0;
-    rc = r_in + R;
-
     alpha = (2 * pi / N);
-
+    r0 = r_in + R;
+    
     for i = 1:length(grid_x)
         for j = 1:length(grid_y)
 
             x = grid_x(i);
             y = grid_y(j);
             r = sqrt(x^2 + y^2);
-            z = y;
+            z = 0;
             
             if (r < R)
                 
@@ -50,13 +48,16 @@ function [MR, MZ] = calculateCoilB(n, N, r_in, r_out, Ic_vec, grid_step)
                 MR(j, i) = Br;
                 MZ(j, i) = Bz;
 
-                [r1, z1] = rotateVector(r, z, alpha);
-                [Br, Bz] = findB(r1, z1, R, Ic_vec(N_vec(n1)));
+                r1 = (r + r0) * cos(alpha) - r0;
+                z1 = (r + r0) * sin(alpha);
+                [Br, Bz] = findB(abs(r1), z1, R, Ic_vec(N_vec(n1)));
                 PROJR1(j, i) = Br;
                 PROJZ1(j, i) = Bz;
 
-                [r2, z2] = rotateVector(r, z, -alpha);
-                [Br, Bz] = findB(r2, z2, R, Ic_vec(N_vec(n2)));
+                r2 = (r + r0) * cos(-alpha) - r0;
+                z2 = (r + r0) * sin(-alpha);
+                
+                [Br, Bz] = findB(abs(r2), z2, R, Ic_vec(N_vec(n2)));
                 PROJR2(j, i) = Br;
                 PROJZ2(j, i) = Bz;
 
