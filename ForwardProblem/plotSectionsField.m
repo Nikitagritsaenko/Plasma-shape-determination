@@ -22,7 +22,7 @@ function [] = plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, mode)
             imagesc([r_in, r_out], [-R, R], MZ);
             title("B_Z n = " + n);
             set(gca,'YDir','normal')
-            caxis([0 100]);
+            caxis([0 50]);
         end
         
         hold on;

@@ -1,4 +1,4 @@
-function [] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
+function [MAGNETIC_B] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
     F = figure('color', 'white', 'Name', 'Tokamak (view from top)');
     
     if (mode == 'R')
@@ -10,7 +10,7 @@ function [] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
     end
     hold on;
     
-    R = (r_out - r_in); % coil radius
+    R = (r_out - r_in) / 2; % coil radius
 
     grid_x = -r_out:step:r_out;
     grid_y = -r_out:step:r_out;
@@ -50,6 +50,7 @@ function [] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
                 r1 = r * cos(dphi1) - r0;
                 z1 = abs(r * sin(dphi1));
                 
+               
                 [Br1, Bz1] = findB(abs(r1), z1, R, Ic_vec(N_vec(n1)));
 
                 dphi2 = phi2 - phi;
@@ -75,11 +76,13 @@ function [] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
     imagesc([-r_out r_out] + center(1), [-r_out r_out] + center(2), MAGNETIC_B)
     colormap(flip(hot));
     colorbar;
+    
     if (mode == 'R')
-        caxis([0, 3]);
+        caxis([-40, 40]);
     else
-        caxis([0, 3]);
+        caxis([0, 50]);
     end
+    
     % Plot circles
     th = 0 : 0.01: 2 * pi;
     x = r_out * cos(th) + center(1);

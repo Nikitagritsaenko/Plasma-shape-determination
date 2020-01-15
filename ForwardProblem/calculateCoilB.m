@@ -58,6 +58,7 @@ function [MR, MZ] = calculateCoilB(n, N, r_in, r_out, Ic_vec, grid_step)
                 z2 = (r + r0) * sin(-alpha);
                 
                 [Br, Bz] = findB(abs(r2), z2, R, Ic_vec(N_vec(n2)));
+                
                 PROJR2(j, i) = Br;
                 PROJZ2(j, i) = Bz;
 
