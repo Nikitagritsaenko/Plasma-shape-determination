@@ -42,22 +42,22 @@ function [MR, MZ] = calculateCoilB(n, N, r_in, r_out, Ic_vec, grid_step)
             r = sqrt(x^2 + y^2);
             z = 0;
             
-            if (r < R)
+            if (r <= R)
                 
                 [Br, Bz] = findB(r, z, R, Ic_vec(N_vec(n0)));
                 MR(j, i) = Br;
                 MZ(j, i) = Bz;
 
-                r1 = (r + r0) * cos(alpha) - r0;
-                z1 = (r + r0) * sin(alpha);
-                [Br, Bz] = findB(abs(r1), z1, R, Ic_vec(N_vec(n1)));
+                r1 = (r + r0) * cos(-alpha) - r0;
+                z1 = (r + r0) * sin(-alpha);
+                [Br, Bz] = findB(r1, z1, R, Ic_vec(N_vec(n1)));
                 PROJR1(j, i) = Br;
                 PROJZ1(j, i) = Bz;
 
-                r2 = (r + r0) * cos(-alpha) - r0;
-                z2 = (r + r0) * sin(-alpha);
+                r2 = (r + r0) * cos(alpha) - r0;
+                z2 = (r + r0) * sin(alpha);
                 
-                [Br, Bz] = findB(abs(r2), z2, R, Ic_vec(N_vec(n2)));
+                [Br, Bz] = findB(r2, z2, R, Ic_vec(N_vec(n2)));
                 
                 PROJR2(j, i) = Br;
                 PROJZ2(j, i) = Bz;

@@ -51,13 +51,13 @@ function [MAGNETIC_B] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
                 z1 = abs(r * sin(dphi1));
                 
                
-                [Br1, Bz1] = findB(abs(r1), z1, R, Ic_vec(N_vec(n1)));
+                [Br1, Bz1] = findB(r1, z1, R, Ic_vec(N_vec(n1)));
 
                 dphi2 = phi2 - phi;
                 r2 = r * cos(dphi2) - r0;
                 z2 = -abs(r * sin(dphi2));
                 
-                [Br2, Bz2] = findB(abs(r2), z2, R, Ic_vec(N_vec(n2)));
+                [Br2, Bz2] = findB(r2, z2, R, Ic_vec(N_vec(n2)));
                 
                 if (mode == 'R')
                     MAGNETIC_B(i, j) = Br1 + Br2;
@@ -78,9 +78,9 @@ function [MAGNETIC_B] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
     colorbar;
     
     if (mode == 'R')
-        caxis([-40, 40]);
+        caxis([-15, 15]);
     else
-        caxis([0, 50]);
+        caxis([0, 15]);
     end
     
     % Plot circles

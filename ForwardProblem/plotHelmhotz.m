@@ -1,72 +1,61 @@
-function [] = plotHelmhotz(I1, I2, H, R)    
+function [] = plotHelmhotz(I1, I2, I3, D, R)    
     
     % 1. Plot in RZ plane
+    H = D / 2;
     grid_step_x = 0.1;
-    grid_x = -R:grid_step_x:R;
-    grid_step_y = 4 * H / (2 * R) * grid_step_x;
-    grid_y = -2*H:grid_step_y:2*H;
+    grid_x = -1.5*R:grid_step_x:1.5*R;
+    grid_step_y = 3 * H / (3 * R) * grid_step_x;
+    grid_y = -1.5*H:grid_step_y:1.5*H;
     
-    MR = zeros(length(grid_y), length(grid_x));
-    MZ = zeros(length(grid_y), length(grid_x));
-    MZR = zeros(length(grid_y), length(grid_x));
+    MR = zeros(length(grid_x), length(grid_y));
+    MZ = zeros(length(grid_x), length(grid_y));
       
-    psi = atan(2 * R / H);
-    S = sqrt(R^2 + H^2/4);
-    
     for i = 1:length(grid_x)
         for j = 1:length(grid_y)  
-            r = abs(grid_x(i));
+            r = grid_x(i);
             z = grid_y(j);    
 
-            [Br1, Bz1, B1] = findB(r, z - H/2, R, I1);
-            [Br2, Bz2, B2] = findB(r, z + H/2, R, I2);
-
-            %[Br1, Bz1] = findBpsi(r, z, psi, S, I1);
-            %[Br2, Bz2] = findBpsi(r, z, psi, S, I2);
+            [Br1, Bz1, ~] = findB(r, z - H, R, I1);
+            [Br2, Bz2, ~] = findB(r, z + H, R, I2);
             
-            MR(j, i) = Br1 + Br2;
-            MZ(j, i) = Bz1 + Bz2;
-            MZR(j, i) = B1 + B2;
+            if (I3 ~= 0)
+                [Br3, Bz3, ~] = findB(r, z, R, I3);
+            end
+            
+            MR(i, j) = Br1 + Br2;
+            MZ(i, j) = Bz1 + Bz2;
+            
+            if (I3 ~= 0)
+                MR(i, j) = MR(i, j) + Br3;
+                MZ(i, j) = MZ(i, j) + Bz3;
+            end
         end
     end
-
-%     nlines = 200;
-%     figure('color', 'white');
-%     %imagesc([-R, R], [-2*H, 2*H], MR);
-%     set(gca,'YDir','normal');
-%     contour(MR, nlines);
-%     axis equal;
-%     title("B_r Helmhotlz");
-%     xlabel('r, m');
-%     ylabel('z, m');
-%     colormap((hot));
-%     colorbar;
-% 
-%     figure('color', 'white');
-%     %imagesc([-R, R], [-2*H, 2*H], MZ);
-%     set(gca,'YDir','normal');
-%     contour(MZ, nlines);
-%     axis equal;
-%     title("B_z Helmhotlz");
-%     xlabel('r, m');
-%     ylabel('z, m');
-%     colormap((hot));
-%     colorbar;
-%     
-%     figure('color', 'white');
-%     %imagesc([-R, R], [-2*H, 2*H], MZ);
-%     set(gca,'YDir','normal');
-%     contour(MZR, nlines);
-%     axis equal;
-%     title("B Helmhotlz");
-%     xlabel('r, m');
-%     ylabel('z, m');
-%     colormap((hot));
-%     colorbar;
     
+    % quiver
     figure('color', 'white');
-    quiver(squeeze(MR), squeeze(MZ));
-    colorbar;
+    quiver(grid_x, grid_y, MR', MZ'); 
+    line([-R, R], [H, H], 'color', 'r', 'linewidth', 2); % coil 1
+    line([-R, R], [-H, -H], 'color', 'r', 'linewidth', 2); % coil 2
+    
+    if (I3 ~= 0)
+        line([-R, R], [0, 0], 'color', 'r', 'linewidth', 2); % coil3
+    end
+   
+    line([0, 0], [-1.5*H, 1.5*H], 'color', 'k'); % symmetric line
     axis equal;
+    
+    legend('vector field', 'coils');
 
+    
+%     % contour Bz
+%     figure('color', 'white');
+%     contour(MZ', 30);
+%     axis equal;
+%     
+%     % contour Br
+%     figure('color', 'white');
+%     contour(MR', 30);
+%     axis equal;
+   
 end
