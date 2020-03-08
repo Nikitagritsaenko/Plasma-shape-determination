@@ -30,8 +30,15 @@ plotHelmhotz(Ih(1), Ih(2), Ih(3), D, R);
 grid_step = 0.005;
 plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, 'R');
 plotSectionsField(N, r_in, r_out, Ic_vec, grid_step, 'Z');
+%% Tokamak three coils: 1, 2, 16:
+Ih = [1 1 1];
+Ih = Ih * 1e7;
+r_in = 0.2;
+R = 0.2;
+plotThreeCoils(Ih(1), Ih(2), Ih(3), r_in, R)   
 %% Tokamak (view from top)
-step = 0.001;
-Br = plotTopField(r_in, r_out, N, Ic_vec, step, 'R');
-Bz = plotTopField(r_in, r_out, N, Ic_vec, step, 'Z');
+step = 0.0025;
+%Br = plotTopField(r_in, r_out, N, Ic_vec, step, 'R');
+%Bz = plotTopField(r_in, r_out, N, Ic_vec, step, 'Z');
+plotTopField(r_in, r_out, N, Ic_vec, step, 'Q');
 

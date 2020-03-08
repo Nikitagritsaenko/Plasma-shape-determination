@@ -16,6 +16,8 @@ function [MAGNETIC_B] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
     grid_y = -r_out:step:r_out;
     
     MAGNETIC_B = zeros(length(grid_x), length(grid_y));
+    MAGNETIC_BR = zeros(length(grid_x), length(grid_y));
+    MAGNETIC_BZ = zeros(length(grid_x), length(grid_y));
     
     N_vec = [5 4 3 2 1 16 15 14 13 12 11 10 9 8 7 6];
     I = Ic_vec;
@@ -59,6 +61,9 @@ function [MAGNETIC_B] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
                 
                 [Br2, Bz2] = findB(r2, z2, R, Ic_vec(N_vec(n2)));
                 
+                MAGNETIC_BR(i, j) = Br1 + Br2;
+                MAGNETIC_BZ(i, j) = Bz1 + Bz2;
+                
                 if (mode == 'R')
                     MAGNETIC_B(i, j) = Br1 + Br2;
                 elseif (mode == 'Z')
@@ -66,16 +71,25 @@ function [MAGNETIC_B] = plotTopField(r_in, r_out, N, Ic_vec, step, mode)
                 else
                     MAGNETIC_B(i, j) = sqrt((Br1 + Br2)^2 + (Bz1 + Bz2)^2);
                 end
-
             end
         end
     end
     
     % Plot field
     center = [r_out r_out];
-    imagesc([-r_out r_out] + center(1), [-r_out r_out] + center(2), MAGNETIC_B)
-    colormap(flip(hot));
-    colorbar;
+    
+    size(grid_x)
+    size(grid_y)
+    size(MAGNETIC_BR')
+    size(MAGNETIC_BZ')
+    
+    if (mode == 'R' || mode == 'Z')
+        imagesc([-r_out r_out] + center(1), [-r_out r_out] + center(2), MAGNETIC_B)
+        colormap(flip(hot));
+        colorbar;
+    else
+        quiver(grid_x + center(1), grid_y + center(2), MAGNETIC_BR', MAGNETIC_BZ');
+    end
     
     if (mode == 'R')
         caxis([-15, 15]);
