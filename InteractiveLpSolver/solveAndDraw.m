@@ -16,8 +16,11 @@
 % создаётся случайным образом, но он фиксирован при взаимодействии с
 % системой (при изменении положений мышью)
 % type - тип датчиков (R или Z)
+% real_data - флажок, будем ли читать данные из файла вместо генерации
+% time_idx - индекс времени, по которому берем показания датчиков
+% time - само время (для отладки)
 
-function [] = solveAndDraw(A, b0, b, I0, error_coeff, probes, currents, distortions, type)
+function [] = solveAndDraw(A, b0, b, I0, error_coeff, probes, currents, distortions, type, real_data, time_idx, time)
     rad_coeff = 0.1;
     
     n = length(b);
@@ -81,16 +84,20 @@ function [] = solveAndDraw(A, b0, b, I0, error_coeff, probes, currents, distorti
     
     plot(1:1:m, I_mls, 'k');
 %    plot(1:1:m, I_tol, 'k');
-    plot(1:1:m, I0, 'k', 'linewidth', 2);
+    if ~real_data
+        plot(1:1:m, I0, 'k', 'linewidth', 2);
+    end
     if ~isempty(I_lp)
         plot(1:1:m, I_lp, 'k');
     end
         
-    lp_I = [];
+    lp_I = []; real_I = [];
     for i = 1:m
-        real_I = plot(i, I0(i), 's', 'MarkerEdgeColor', 'k',...
-            'MarkerFaceColor','b',...
-            'MarkerSize',8);
+        if ~real_data
+            real_I = plot(i, I0(i), 's', 'MarkerEdgeColor', 'k',...
+                'MarkerFaceColor','b',...
+                'MarkerSize',8);
+        end
         if ~isempty(I_lp)
             lp_I = plot(i, I_lp(i), 's', 'MarkerEdgeColor', 'k',...
                 'MarkerFaceColor','g',...
@@ -107,8 +114,8 @@ function [] = solveAndDraw(A, b0, b, I0, error_coeff, probes, currents, distorti
 %     legend([real_I, mls_I, tol_I, lp_I], ...
 %            {'real I', 'mls I', 'tol I', 'lp_{2n} I'}, ...
 %            'Location', 'eastoutside');
-    legend([real_I, mls_I, lp_I], ...
-          {'real I', 'mls I', 'lp_{2n} I'}, ...
+    legend([mls_I, lp_I, real_I], ...
+          {'mls I', 'lp_{2n} I', 'real I'}, ...
            'Location', 'eastoutside');
        
     subplot(3,3,2);
@@ -118,32 +125,36 @@ function [] = solveAndDraw(A, b0, b, I0, error_coeff, probes, currents, distorti
     title('b vector'); 
     
     b_real = plot(1:1:n, b0, 'b', 'linewidth', 2);
-    b_distorted = plot(1:1:n, b, 'r');
-    b_bound = plot(1:1:n, b0 * (1 + error_coeff), 'k--');
-    b_bound = plot(1:1:n, b0 * (1 - error_coeff), 'k--');
-    
-    b_lp = [];
-    if ~isempty(I_lp)
-        b_sol = A * I_lp;
-        for i = 1:n
-            b_lp = plot(i, b_sol(i), 's', 'MarkerEdgeColor', 'k',...
-                'MarkerFaceColor','g',...
-                'MarkerSize',8);
-        end
-        
+    b_distorted = []; b_bound = [];
+    if ~real_data
+        b_distorted = plot(1:1:n, b, 'r');
+        b_bound = plot(1:1:n, b0 * (1 + error_coeff), 'k--');
+        b_bound = plot(1:1:n, b0 * (1 - error_coeff), 'k--');
     end
     
-    legend([b_real, b_distorted, b_bound, b_lp], ...
-        {'real b vector', 'distorted b vector', 'distortion bounds', 'lp_{2n} b vector'}, ...
+    b_lp = [];
+    b_sol = A * I_lp;
+    b_sol_mls = A * I_mls; 
+    for i = 1:n 
+        b_mls = plot(i, b_sol_mls(i), 's', 'MarkerEdgeColor', 'k',...
+            'MarkerFaceColor','r',...
+            'MarkerSize',8);
+        b_lp = plot(i, b_sol(i), 's', 'MarkerEdgeColor', 'k',...
+            'MarkerFaceColor','g',...
+            'MarkerSize',8);
+    end
+    
+    legend([b_real,  b_lp, b_mls, b_distorted, b_bound], ...
+        {'real b vector', 'lp_{2n} b vector', 'mls b vector','distorted b vector', 'distortion bounds'}, ...
         'Location', 'eastoutside'); 
     
     subplot(3,3,[6 9]);
     limiter = readmatrix('data/lim.txt') / 100;
-    plotTokamakSection(I_lp, probes, currents, distortions, type, error_coeff, false);
+    plotTokamakSection(I_lp, probes, currents, distortions, type, error_coeff, false, real_data, time_idx);
     
     X = []; Y = [];
     for i=1:m
-        N = floor((I_lp(i) / 1e7) * 100);
+        N = floor((I_lp(i) / 1e6) * 100);
         for j=1:N
             X = [X; currents(i, 1)];
             Y = [Y; currents(i, 2)];
@@ -157,8 +168,14 @@ function [] = solveAndDraw(A, b0, b, I0, error_coeff, probes, currents, distorti
     delta_mls = norm(I_mls - I0) / norm(I0);
     
     set(gca,'visible','off');
-    text(0.5, 0.5, sprintf("distortion = %0.2f\n\\delta_{lp} = %0.2f\n\\delta_{mls} = %0.2f\n\\alpha = %0.2f", ...
-        error_coeff, delta_lp, delta_mls, alpha),...
-        'FontSize', 14);
+    if ~real_data
+        text(0.5, 0.5, sprintf("distortion = %0.2f\n\\delta_{lp} = %0.2f\n\\delta_{mls} = %0.2f\n\\alpha = %0.2f", ...
+            error_coeff, delta_lp, delta_mls, alpha),...
+            'FontSize', 14);
+    else
+        text(0.5, 0.5, sprintf("Time = %0.6f (%i / 105)", ...
+            time, time_idx),...
+            'FontSize', 18);
+    end
     
 end

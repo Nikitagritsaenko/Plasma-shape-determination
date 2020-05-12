@@ -38,7 +38,8 @@ function [I, w] = LP(A, b, rad_coeff)
         -b];
 
     lb = zeros(m + 2*n, 1); % z >= 0
-    
+    ub = [];
+   
     % signature "x = linprog(f, A, b, Aeq, beq, lb, ub)"
     % find z |
     %  z = min_z(h^T*z)
@@ -46,7 +47,7 @@ function [I, w] = LP(A, b, rad_coeff)
     %  z >= 0   (z >= lb)  
     
     options = optimoptions('linprog','Algorithm','dual-simplex');
-    [Iw, fval,exitflag,output] = linprog(h, C, d, [], [], lb, [], options)
+    [Iw, fval,exitflag,output] = linprog(h, C, d, [], [], lb, ub, options)
     
     if isempty(Iw)
         I = [];
@@ -56,8 +57,7 @@ function [I, w] = LP(A, b, rad_coeff)
     end
     
     I = Iw(1:m, :);
-    w = Iw(m+1:m+2*n, :);
-    
+    w = Iw(m+1:m+2*n, :);    
 end
 
  

@@ -8,6 +8,7 @@
 %
 % n - число магнитных датчиков
 % m - число токовых колец
+% real_data - флажок, будем ли читать данные из файла вместо генерации
 %
 % Выходные данные
 %
@@ -15,13 +16,13 @@
 % probes - положения датчиков
 % currents - положения токовых колец
 
-function [I, probes, currents] = generate(n, m)
+function [I, probes, currents] = generate(n, m, real_data)
 
     I_vector = zeros(m, 1);
     for i = 1:m
         I_vector(i) = 1 + abs(rand()) * 5;
     end
-    I = 1e7 * I_vector;
+    I = 1e6 * I_vector;
         
     probes = [];
     currents = [];
@@ -40,26 +41,31 @@ function [I, probes, currents] = generate(n, m)
     limiter = readmatrix('data\lim.txt') / 100;
     probes = [];
     
-    % расставляем датчики по лимитеру
-    k = size(limiter, 1);
-    
-    s = 1; % стартовая точка на лимитере
-    while limiter(s, 1) <= r_in
-        s = s + 1;
-    end
-    
-    e = k; % конечная точка на лимитере
-    while limiter(e, 1) <= r_in
-        e = e - 1;
-    end
-    
-    step = (e - s) / (n - 1);
-    for i = 1:n
-        ind = floor(s + (i-1) * step);
+    if real_data
+        probes = readmatrix('data\probes21.txt') / 1000;
+        probes = probes(:, 1:2);
+    else
+        % расставляем датчики по лимитеру
+        k = size(limiter, 1);
 
-        new_probe = limiter(ind, :);
-        probes = [probes
-                  new_probe];
+        s = 1; % стартовая точка на лимитере
+        while limiter(s, 1) <= r_in
+            s = s + 1;
+        end
+
+        e = k; % конечная точка на лимитере
+        while limiter(e, 1) <= r_in
+            e = e - 1;
+        end
+
+        step = (e - s) / (n - 1);
+        for i = 1:n
+            ind = floor(s + (i-1) * step);
+
+            new_probe = limiter(ind, :);
+            probes = [probes
+                      new_probe];
+        end
     end
     
     % расставляем токи по эллипсу

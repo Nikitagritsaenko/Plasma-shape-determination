@@ -1,4 +1,4 @@
-% function [] = plotTokamakSection(I, probes, currents, distortions, type, error_coeff, interactive)
+% function [] = plotTokamakSection(I, probes, currents, distortions, type, error_coeff, interactive, real_data, time_idx)
 %
 % Рисует сечение токамака: лимитер, столб токамака, датчики и токи. Также
 % выводятся значения токов. 
@@ -19,8 +19,10 @@
 % type - тип датчиков (R или Z)
 % error_coeff - значение возмущения в правой части
 % interactive - флаг интерактивного взаимодействия
+% real_data - флажок, будем ли читать данные из файла вместо генерации
+% time_idx - индекс времени, по которому берем показания датчиков
 
-function [] = plotTokamakSection(I, probes, currents, distortions, type, error_coeff, interactive)
+function [] = plotTokamakSection(I, probes, currents, distortions, type, error_coeff, interactive, real_data, time_idx)
     global dpt;
     
     n = size(probes, 1);
@@ -53,7 +55,7 @@ function [] = plotTokamakSection(I, probes, currents, distortions, type, error_c
             end
             text(currents(i, 1) + 0.04, currents(i, 2) + 0.04, sprintf('%i', i), 'FontSize', 8)
             text(-0.5, 1 - i * 0.1, ...
-                sprintf('I_{%i} = %.2f', i, I(i) / 1e7), 'FontSize', 12)
+                sprintf('I_{%i} = %.2f', i, I(i) / 1e6), 'FontSize', 12)
         end
        
     end
@@ -86,13 +88,13 @@ function [] = plotTokamakSection(I, probes, currents, distortions, type, error_c
     function updateProbe(varargin)
         idx = get(varargin{1,1}, 'UserData');
         probes(idx, :) = probes(idx, :) + dpt;
-        update(I, probes, currents, distortions, type, error_coeff);
+        update(I, probes, currents, distortions, type, error_coeff, real_data, time_idx);
     end
 
     function updateCurrent(varargin)
         idx = get(varargin{1,1}, 'UserData');
         currents(idx - n, :) = currents(idx - n, :) + dpt;
-        update(I, probes, currents, distortions, type, error_coeff);
+        update(I, probes, currents, distortions, type, error_coeff, real_data, time_idx);
     end
 
 end

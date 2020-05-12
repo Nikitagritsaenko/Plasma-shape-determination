@@ -7,6 +7,12 @@
 % alpha - угол наклона эллипса (рад)
 % a, b - размер полуосей эллипса
 function [alpha, a, b] = drawEllipse(X, Y)
+    if isempty(X) || isempty(Y)
+        alpha = -1;
+        a = -1;
+        b = -1;
+        return;
+    end
     K = corr(X, Y); % коэфф. коррел€ции ѕирсона
     sigma_x = sqrt(var(X));
     sigma_y = sqrt(var(Y));

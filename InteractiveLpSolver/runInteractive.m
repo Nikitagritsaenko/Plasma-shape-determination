@@ -10,10 +10,10 @@
 % currents - положения токов
 % type - тип датчиков (R или Z)
 % error_coeff - значение возмущения в правой части
+% real_data - флажок, будем ли читать данные из файла вместо генерации
+% time_idx - индекс времени, по которому берем показания датчиков
 
-function [] = runInteractive(I, probes, currents, type, error_coeff)    
-    f = figure('units','normalized','outerposition',[0 0 1 1],'color','white');
-    
+function [] = runInteractive(I, probes, currents, type, error_coeff, real_data, time_idx)    
     n = size(probes, 1);
     m = size(currents, 1);
     
@@ -23,6 +23,6 @@ function [] = runInteractive(I, probes, currents, type, error_coeff)
         distortions(j) = rand();
     end
     
-    update(I, probes, currents, distortions, type, error_coeff);
+    update(I, probes, currents, distortions, type, error_coeff, real_data, time_idx);
 
 end
